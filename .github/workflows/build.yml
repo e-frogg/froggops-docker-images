@@ -4,6 +4,8 @@ name: Create and publish a Docker image
 on:
   push:
     branches: ['main']
+  pull_request:
+    branches: ['main']
 
 env:
   REGISTRY: ghcr.io
@@ -55,16 +57,45 @@ jobs:
             type=raw,value=${{ matrix.fops_version }}
             type=raw,value=latest
       
-      - name: Build and push Docker image
+      - name: Build Docker image
+        id: build
+        uses: docker/build-push-action@5e99dacf67635c4f273e532b9266ddb609b3025a
+        with:
+          context: ./${{ matrix.image }}
+          push: false
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            FOPS_IMAGE_VERSION=${{ matrix.fops_version }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}-${{ matrix.image }}:${{ matrix.fops_version }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Push Docker image
         id: push
+        if: success()
         uses: docker/build-push-action@5e99dacf67635c4f273e532b9266ddb609b3025a
         with:
           context: ./${{ matrix.image }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            FOPS_IMAGE_VERSION=${{ matrix.fops_version }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
