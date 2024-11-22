@@ -17,7 +17,11 @@ jobs:
   build-and-push-image:
     strategy:
       matrix:
-        image: ['mkdocs']
+        include:
+          - image: 'mkdocs'
+            fops_version: '9'
+          - image: 'caddy-maintenance'
+            fops_version: '2'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,6 +51,8 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.image }}
+          tags: |
+            type=raw,value=fops${{ matrix.fops_version }}
 
       - name: Build and push Docker image
         id: push
@@ -56,6 +62,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            FOPS_IMAGE_VERSION=${{ matrix.fops_version }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1

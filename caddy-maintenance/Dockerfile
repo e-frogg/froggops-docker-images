@@ -1,14 +1,14 @@
-FROM caddy:2-builder AS builder
+ARG FOPS_IMAGE_VERSION
+FROM caddy:${FOPS_IMAGE_VERSION}-builder AS builder
 
 RUN xcaddy build \
     --with github.com/caddyserver/transform-encoder \
     --with github.com/e-frogg/fops-caddy-maintenance
 
-FROM caddy:2
+FROM caddy:${FOPS_IMAGE_VERSION}
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-# Default Caddy ports
 EXPOSE 443
 EXPOSE 443/udp
 
