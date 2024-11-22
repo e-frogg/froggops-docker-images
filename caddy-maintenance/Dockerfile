@@ -1,4 +1,7 @@
 ARG FOPS_IMAGE_VERSION
+LABEL org.opencontainers.image.source=https://github.com/e-frogg/froggops-docker-images
+LABEL org.opencontainers.image.description="Caddy with frops maintenance plugin"
+LABEL org.opencontainers.image.licenses=MIT
 FROM caddy:${FOPS_IMAGE_VERSION}-builder AS builder
 
 RUN xcaddy build \
