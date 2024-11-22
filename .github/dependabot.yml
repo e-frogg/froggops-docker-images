@@ -7,7 +7,13 @@ updates:
     open-pull-requests-limit: 10
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/mkdocs"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10 
+
+  - package-ecosystem: "docker"
+    directory: "/caddy-maintenance"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10 
