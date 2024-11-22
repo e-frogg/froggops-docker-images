@@ -8,8 +8,6 @@ FROM caddy:2
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-RUN apk add --no-cache bash curl
-
 # Default Caddy ports
 EXPOSE 443
 EXPOSE 443/udp
