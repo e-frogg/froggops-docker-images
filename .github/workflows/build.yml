@@ -82,10 +82,11 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && github.event_name == 'pull_request'
         with:
           sarif_file: 'trivy-results.sarif'
+          category: trivy-${{ matrix.image }}
 
       - name: Push Docker image
         id: push
