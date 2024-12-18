@@ -1,32 +1,31 @@
 ARG FOPS_IMAGE_VERSION
-FROM node:23-alpine AS node
+
+FROM node:23 AS node
 
 FROM composer/composer:2-bin AS composer
 FROM mlocati/php-extension-installer:latest AS php_extension_installer
 
-FROM php:${FOPS_IMAGE_VERSION}-cli-alpine
+FROM php:${FOPS_IMAGE_VERSION}-cli
 
-# install deps packages + php extensions
 COPY --from=php_extension_installer --link /usr/bin/install-php-extensions /usr/local/bin/
 
-RUN apk add --update --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-client \
     git \
     bash \
-    libxslt-dev \
+    libxslt1-dev \
     libpng-dev \
-    icu \
-    icu-dev \
+    libicu-dev \
     libzip-dev \
-    bzip2-dev \
+    libbz2-dev \
     file \
-    docker \
-    docker-cli \
+    docker.io \
     docker-compose \
     curl \
     make \
     sudo \
     ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
     && set -eux; \
     install-php-extensions \
         intl \
@@ -44,24 +43,20 @@ RUN apk add --update --no-cache \
         pdo_mysql \
         soap \
         redis \
-        amqp ;
+        amqp
 
-# composer install
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 COPY --from=composer --link /composer /usr/bin/composer
 
-# castor (outil supplémentaire)
 RUN composer global require jolicode/castor
 
-RUN apk add --no-cache \
-    bash \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     tar \
     gzip \
-    libc6-compat
+    && rm -rf /var/lib/apt/lists/*
 
-# copy nodes deps
 COPY --from=node /usr/lib /usr/lib
 COPY --from=node /usr/local/lib /usr/local/lib
 COPY --from=node /usr/local/include /usr/local/include
@@ -71,8 +66,7 @@ ENV PATH="/usr/local/lib/node_modules/.bin:${PATH}"
 
 RUN node --version && npm --version
 
-# install playwright
 RUN npx playwright install
+RUN npx playwright install-deps
 
-# Configuration PHP
 COPY --link ./php.ini $PHP_INI_DIR/conf.d/
