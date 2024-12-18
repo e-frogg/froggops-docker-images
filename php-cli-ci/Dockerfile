@@ -25,6 +25,7 @@ RUN apk add --update --no-cache \
     curl \
     make \
     sudo \
+    ca-certificates \
     && set -eux; \
     install-php-extensions \
         intl \
