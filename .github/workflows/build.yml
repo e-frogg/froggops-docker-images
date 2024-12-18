@@ -24,6 +24,8 @@ jobs:
             fops_version: '9'
           - image: 'caddy-maintenance'
             fops_version: '2'
+          - image: 'php-cli-ci'
+            fops_version: '8.3'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -80,6 +82,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          skip-dirs: '/root/.composer'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
