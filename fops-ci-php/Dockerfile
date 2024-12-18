@@ -7,6 +7,12 @@ FROM mlocati/php-extension-installer:latest AS php_extension_installer
 
 FROM php:${FOPS_IMAGE_VERSION}-cli
 
+
+#
+# PHP deps
+#
+
+
 COPY --from=php_extension_installer --link /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -19,8 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzip-dev \
     libbz2-dev \
     file \
-    docker.io \
-    docker-compose \
     curl \
     make \
     sudo \
@@ -45,12 +49,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         redis \
         amqp
 
+
+
+COPY --link ./php.ini $PHP_INI_DIR/conf.d/
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 COPY --from=composer --link /composer /usr/bin/composer
 
 RUN composer global require jolicode/castor
 
+#
+# Nodes deps
+#
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     tar \
@@ -69,4 +80,28 @@ RUN node --version && npm --version
 RUN npx playwright install
 RUN npx playwright install-deps
 
-COPY --link ./php.ini $PHP_INI_DIR/conf.d/
+
+#
+# Docker client deps
+#
+
+
+
+RUN apt-get update
+RUN apt-get install -y ca-certificates curl
+RUN install -m 0755 -d /etc/apt/keyrings
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+RUN chmod a+r /etc/apt/keyrings/docker.asc
+
+RUN echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update
+
+RUN apt-get install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin
+
+RUN docker run hello-world
+
+
+
