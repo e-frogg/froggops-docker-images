@@ -101,7 +101,4 @@ RUN apt-get update
 
 RUN apt-get install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin
 
-RUN docker run hello-world
-
-
 
