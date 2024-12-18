@@ -24,6 +24,7 @@ RUN apk add --update --no-cache \
     docker-compose \
     curl \
     make \
+    sudo \
     && set -eux; \
     install-php-extensions \
         intl \
