@@ -1,4 +1,5 @@
 ARG FOPS_IMAGE_VERSION
+FROM node:23-alpine AS node
 
 FROM composer/composer:2-bin AS composer
 FROM mlocati/php-extension-installer:latest AS php_extension_installer
@@ -52,6 +53,27 @@ COPY --from=composer --link /composer /usr/bin/composer
 
 # castor (outil supplémentaire)
 RUN composer global require jolicode/castor
+
+RUN apk add --no-cache \
+    bash \
+    curl \
+    tar \
+    gzip \
+    libc6-compat
+
+# copy nodes deps
+COPY --from=node /usr/lib /usr/lib
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/include /usr/local/include
+COPY --from=node /usr/local/bin /usr/local/bin
+
+ENV PATH="/usr/local/lib/node_modules/.bin:${PATH}"
+
+RUN node --version && npm --version
+
+# install playwright
+RUN npx playwright install
+RUN npx playwright install-deps
 
 # Configuration PHP
 COPY --link ./php.ini $PHP_INI_DIR/conf.d/

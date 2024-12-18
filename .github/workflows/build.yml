@@ -24,7 +24,7 @@ jobs:
             fops_version: '9'
           - image: 'caddy-maintenance'
             fops_version: '2'
-          - image: 'php-cli-ci'
+          - image: 'fops-ci-php'
             fops_version: '8.3'
     runs-on: ubuntu-latest
     permissions:
