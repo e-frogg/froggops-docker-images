@@ -7,8 +7,24 @@ FROM php:${FOPS_IMAGE_VERSION}-cli-alpine
 
 # install deps packages + php extensions
 COPY --from=php_extension_installer --link /usr/bin/install-php-extensions /usr/local/bin/
-RUN apk add --update --no-cache openssh-client git bash libxslt-dev libpng-dev icu icu-dev libzip-dev bzip2-dev file docker-cli
-RUN set -eux; \
+
+RUN apk add --update --no-cache \
+    openssh-client \
+    git \
+    bash \
+    libxslt-dev \
+    libpng-dev \
+    icu \
+    icu-dev \
+    libzip-dev \
+    bzip2-dev \
+    file \
+    docker \
+    docker-cli \
+    docker-compose \
+    curl \
+    make \
+    && set -eux; \
     install-php-extensions \
         intl \
         zip \
@@ -17,7 +33,6 @@ RUN set -eux; \
         sockets \
         xsl \
         gd \
-        zip \
         bz2 \
         bcmath \
         pcntl \
@@ -26,15 +41,15 @@ RUN set -eux; \
         pdo_mysql \
         soap \
         redis \
-        amqp \
-    ;
+        amqp ;
 
 # composer install
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 COPY --from=composer --link /composer /usr/bin/composer
 
-
+# castor (outil supplémentaire)
 RUN composer global require jolicode/castor
 
+# Configuration PHP
 COPY --link ./php.ini $PHP_INI_DIR/conf.d/
