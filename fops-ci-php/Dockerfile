@@ -57,7 +57,8 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 COPY --from=composer --link /composer /usr/bin/composer
 
-RUN composer global require jolicode/castor
+RUN composer global require jolicode/castor \
+    && ln -s /usr/bin/castor /root/.composer/vendor/bin/castor
 
 #
 # Nodes deps
