@@ -73,7 +73,6 @@ RUN node --version && npm --version
 
 # install playwright
 RUN npx playwright install
-RUN npx playwright install-deps
 
 # Configuration PHP
 COPY --link ./php.ini $PHP_INI_DIR/conf.d/
