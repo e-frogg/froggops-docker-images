@@ -38,5 +38,3 @@ COPY --from=composer --link /composer /usr/bin/composer
 RUN composer global require jolicode/castor
 
 COPY --link ./php.ini $PHP_INI_DIR/conf.d/
-
-ENTRYPOINT ["/bin/sh"]
