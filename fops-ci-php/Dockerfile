@@ -103,3 +103,15 @@ RUN apt-get update
 RUN apt-get install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin
 
 
+
+
+#
+# Tools / System
+#
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnss3-tools \
+    && rm -rf /var/lib/apt/lists/* \
+    && set -eux; \
+    mkdir -p /root/.pki/nssdb \
+    && certutil -d /root/.pki/nssdb -N
