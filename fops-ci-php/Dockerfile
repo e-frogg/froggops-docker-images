@@ -57,8 +57,10 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 COPY --from=composer --link /composer /usr/bin/composer
 
-RUN composer global require jolicode/castor \
-    && ln -s /root/.composer/vendor/bin/castor /usr/bin/castor
+RUN curl "https://github.com/jolicode/castor/releases/latest/download/castor.linux-amd64.phar" -Lfso /usr/bin/castor && \
+    chmod u+x /usr/bin/castor && \
+    castor --version || \
+    (echo "Could not install castor. Is the target directory writeable?" && (exit 1))
 
 #
 # Nodes deps
