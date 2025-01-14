@@ -29,6 +29,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     sudo \
     ca-certificates \
+    rsync \
+    jq \
     && rm -rf /var/lib/apt/lists/* \
     && set -eux; \
     install-php-extensions \
