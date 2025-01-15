@@ -5,4 +5,4 @@ LABEL org.opencontainers.image.description="Mkdocs with custom plugins"
 LABEL org.opencontainers.image.licenses=MIT
 
 # hadolint ignore=DL3013
-RUN pip install --no-cache-dir markdown-callouts mkdocs-literate-nav
+RUN pip install --no-cache-dir markdown-callouts mkdocs-literate-nav mkdocs-glightbox
