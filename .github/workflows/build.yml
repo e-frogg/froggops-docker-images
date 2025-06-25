@@ -26,6 +26,8 @@ jobs:
             fops_version: '2'
           - image: 'fops-ci-php'
             fops_version: '8.3'
+          - image: 'fops-ci-php'
+            fops_version: '8.4'
     runs-on: ubuntu-latest
     permissions:
       contents: read
