@@ -83,9 +83,6 @@ ENV PATH="/usr/local/lib/node_modules/.bin:${PATH}"
 
 RUN node --version && npm --version
 
-RUN npx playwright install
-RUN npx playwright install-deps
-
 
 #
 # Docker client deps
