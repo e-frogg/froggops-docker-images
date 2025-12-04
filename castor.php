@@ -13,7 +13,7 @@ use function Castor\run;
 function docker_run(
     string $imageName,
     string $fopsVersion,
-    string $containerCommand
+    string $containerCommand = ''
 ): void {
     run("docker run -it --rm -v $(pwd):/app local/$imageName:$fopsVersion $containerCommand",
     context:context()->toInteractive());
@@ -46,6 +46,6 @@ function docker_exec(
         --ignore-unfixed \
         --exit-code 1 \
         --cache-dir /tmp/trivy/ \
-        local/$imageName:dev || true"
+        local/$imageName:$fopsVersion || true"
     );
 }

@@ -1,0 +1,10 @@
+{
+    debug
+    admin 0.0.0.0:2019
+    {$CADDY_MAIN_DIRECTIVES}
+    order maintenance first
+}
+
+import /etc/fops-router/entrypoints/*.Caddyfile
+
+{$CADDY_VHOSTS}

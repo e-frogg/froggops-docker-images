@@ -1,0 +1,31 @@
+maintenance {
+    status_file /data/maintenance-status.json
+    {$CADDY_MAINTENANCE_DIRECTIVES}
+}
+
+{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+# access log using apache combined log format + remote source port
+# rotated if the file grows more than 1G
+# stored for a maximum of 13 months
+log {
+    output file /var/log/caddy/{args[0]}.access.log {
+        roll_size 1000MiB      # ~1 GiB
+        roll_keep_for 9360h    # ~13 mois
+    }
+
+    format transform `{request>client_ip}{if>request>client_ip?""}:{request>remote_ip}:{request>remote_port} - - [{ts}] "{request>method} {request>uri} {request>proto}" {status} {size} "{request>headers>Referer>[0]}" "{request>headers>User-Agent>[0]}" "{request>host}" {duration}` {
+        time_format "02/Jan/2006:15:04:05 -0700"
+    }
+}
+
+log {
+    output file /var/log/caddy/{args[0]}.access.json {
+		roll_size 100mb
+		roll_keep 5
+		roll_keep_for 720h
+    }
+    format json {
+        time_format iso8601
+    }
+}
