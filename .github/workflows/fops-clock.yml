@@ -115,7 +115,7 @@ jobs:
 
       - name: Generate artifact attestation
         if: steps.push.outputs.digest != ''
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ env.IMAGE_SUFFIX }}
           subject-digest: ${{ steps.push.outputs.digest }}
