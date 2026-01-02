@@ -117,3 +117,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && set -eux; \
     mkdir -p /root/.pki/nssdb \
     && certutil -d /root/.pki/nssdb -N
+
+
+COPY --from=gitlab/glab:latest /usr/bin/glab /usr/local/bin/glab
