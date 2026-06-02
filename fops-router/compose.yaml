@@ -1,0 +1,37 @@
+services:
+  fops-router:
+    image: ${FOPS_ROUTER_IMAGE:-ghcr.io/e-frogg/froggops-docker-images-fops-router}:${FOPS_ROUTER_VERSION:-latest}
+    container_name: ${FOPS_ROUTER_CONTAINER_NAME:-fops-router}
+    restart: unless-stopped
+    environment:
+      FOPS_ROUTER_API_TOKEN: ${FOPS_ROUTER_API_TOKEN:?Set FOPS_ROUTER_API_TOKEN in .env}
+      CADDY_MAIN_DIRECTIVES: |
+        email ${CADDY_ACME_EMAIL:?Set CADDY_ACME_EMAIL in .env}
+      CADDY_MAINTENANCE_DIRECTIVES: |
+        default_enabled ${FOPS_ROUTER_MAINTENANCE_DEFAULT_ENABLED:-false}
+        allowed_ips_file /etc/fops-router/maintenance-ips.txt
+      CADDY_SERVER_EXTRA_DIRECTIVES: |
+        encode zstd gzip
+        header {
+          X-Content-Type-Options nosniff
+        }
+    ports:
+      - "${FOPS_ROUTER_HTTP_BIND:-0.0.0.0:80}:80"
+      - "${FOPS_ROUTER_HTTPS_BIND:-0.0.0.0:443}:443"
+      - "${FOPS_ROUTER_HTTPS_UDP_BIND:-0.0.0.0:443}:443/udp"
+    volumes:
+      - fops_router_data:/data
+      - fops_router_config:/config
+      - fops_router_logs:/var/log/caddy
+      - ./entrypoints:/etc/fops-router/entrypoints:ro
+    networks:
+      - fops-router
+
+networks:
+  fops-router:
+    name: ${FOPS_ROUTER_NETWORK:-fops-router}
+
+volumes:
+  fops_router_data:
+  fops_router_config:
+  fops_router_logs:

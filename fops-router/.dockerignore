@@ -1,0 +1,9 @@
+.git
+.idea
+.env
+entrypoints
+maintenance-ips.txt
+*.log
+tmp
+vendor
+node_modules
