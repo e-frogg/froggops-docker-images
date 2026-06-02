@@ -1,6 +1,6 @@
 ARG FOPS_IMAGE_VERSION
 
-FROM node:24-trixie AS node
+FROM node:26-trixie AS node
 
 FROM composer/composer:2-bin AS composer
 FROM mlocati/php-extension-installer:latest AS php_extension_installer
