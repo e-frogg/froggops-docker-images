@@ -88,16 +88,16 @@ environment:
 
 ## Routage dynamique
 
-Le routeur expose un wrapper métier interne au conteneur, appelé depuis l’hôte avec `docker exec`. `fops-cli` ne connaît que le nom du conteneur ; le wrapper masque l’admin API Caddy locale, le socket Unix `/run/caddy/admin.sock` et les endpoints HTTP internes.
+Le routeur expose un wrapper métier interne au conteneur, appelé depuis l’hôte avec `docker compose exec fops-router`. `fops-cli` ne connaît que le nom du service Compose ; le wrapper masque l’admin API Caddy locale, le socket Unix `/run/caddy/admin.sock` et les endpoints HTTP internes.
 
 Commandes :
-- `fops-routerctl status`
-- `fops-routerctl put-stack <project> <instance> <json-payload>`
-- `fops-routerctl delete-stack <project> <instance>`
+- `docker compose exec fops-router fops-routerctl status`
+- `docker compose exec fops-router fops-routerctl put-stack <project> <instance> <json-payload>`
+- `docker compose exec fops-router fops-routerctl delete-stack <project> <instance>`
 
 Exemple depuis l’hôte :
 ```bash
-docker exec fops-router fops-routerctl put-stack example-app production '{
+docker compose exec fops-router fops-routerctl put-stack example-app production '{
     "project": "example-app",
     "instance": "production",
     "routes": [
@@ -174,17 +174,17 @@ Le plugin expose des points d’accès sur l’admin API Caddy locale :
 Exemples :
 ```bash
 # Statut
-docker exec fops-router curl --unix-socket /run/caddy/admin.sock \
+docker compose exec fops-router curl --unix-socket /run/caddy/admin.sock \
   http://localhost/maintenance/status
 
 # Activer
-docker exec fops-router curl --unix-socket /run/caddy/admin.sock \
+docker compose exec fops-router curl --unix-socket /run/caddy/admin.sock \
   -X POST -H "Content-Type: application/json" \
   -d '{"enabled": true}' \
   http://localhost/maintenance/set
 
 # Désactiver
-docker exec fops-router curl --unix-socket /run/caddy/admin.sock \
+docker compose exec fops-router curl --unix-socket /run/caddy/admin.sock \
   -X POST -H "Content-Type: application/json" \
   -d '{"enabled": false}' \
   http://localhost/maintenance/set
