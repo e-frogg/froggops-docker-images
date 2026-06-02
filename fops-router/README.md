@@ -73,7 +73,6 @@ debug'
 - `CADDY_VHOSTS` : vhosts ajoutés en ligne (alternative aux fichiers `entrypoints/*.Caddyfile`).
 - `CADDY_MAINTENANCE_DIRECTIVES` : sous-directives du bloc `maintenance { ... }`.
 - `CADDY_SERVER_EXTRA_DIRECTIVES` : injecté dans chaque vhost qui importe `entrypoint.Caddyfile` (pratique pour `encode`, `header`, etc.).
-- `FOPS_ROUTER_API_TOKEN` : token Bearer obligatoire pour l’API dynamique `/fops-router/v1/*`.
 
 Note : ces variables sont écrites telles quelles dans des fichiers `*.Caddyfile` runtime au démarrage du conteneur.
 
@@ -89,26 +88,16 @@ environment:
 
 ## Routage dynamique
 
-Le routeur expose une API métier sur l’admin API Caddy locale. Par défaut, cette admin API n’écoute pas en TCP : elle est disponible via le socket Unix réservé au propriétaire `/run/caddy/admin.sock` et destinée à être appelée par `fops-cli` après `stack:install` ou un déploiement.
+Le routeur expose un wrapper métier interne au conteneur, appelé depuis l’hôte avec `docker exec`. `fops-cli` ne connaît que le nom du conteneur ; le wrapper masque l’admin API Caddy locale, le socket Unix `/run/caddy/admin.sock` et les endpoints HTTP internes.
 
-Points d’accès :
-- `GET /fops-router/v1/status`
-- `GET /fops-router/v1/stacks`
-- `PUT /fops-router/v1/stacks/{project}/{instance}`
-- `DELETE /fops-router/v1/stacks/{project}/{instance}`
+Commandes :
+- `fops-routerctl status`
+- `fops-routerctl put-stack <project> <instance> <json-payload>`
+- `fops-routerctl delete-stack <project> <instance>`
 
-Toutes les requêtes exigent :
+Exemple depuis l’hôte :
 ```bash
-Authorization: Bearer $FOPS_ROUTER_API_TOKEN
-```
-
-Exemple depuis l’hôte, via `docker exec` :
-```bash
-docker exec fops-router curl --unix-socket /run/caddy/admin.sock \
-  -X PUT http://localhost/fops-router/v1/stacks/example-app/production \
-  -H "Authorization: Bearer $FOPS_ROUTER_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
+docker exec fops-router fops-routerctl put-stack example-app production '{
     "project": "example-app",
     "instance": "production",
     "routes": [
@@ -163,7 +152,6 @@ docker compose up -d
 ```
 
 Points importants :
-- remplace `FOPS_ROUTER_API_TOKEN` par un secret long et aléatoire
 - renseigne `CADDY_ACME_EMAIL`
 - connecte les services à router au réseau Docker `fops-router` ou déclare un alias réseau utilisé dans les charges utiles dynamiques
 - ajoute tes vhosts statiques dans `entrypoints/*.Caddyfile` si tu n’utilises pas uniquement l’API dynamique
@@ -301,4 +289,5 @@ app.localhost {
 ## Sécurité (à ne pas zapper)
 
 - L’admin API Caddy écoute par défaut sur le socket Unix réservé au propriétaire `/run/caddy/admin.sock`, pas en TCP.
+- Le contrat d’administration à distance est `docker exec <container> fops-routerctl ...`; l’accès est donc contrôlé par les droits Docker sur l’hôte.
 - Si tu modifies le Caddyfile pour réactiver une écoute TCP admin, garde-la strictement privée et filtrée.

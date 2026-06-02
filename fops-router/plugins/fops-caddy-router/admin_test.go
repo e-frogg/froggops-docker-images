@@ -14,30 +14,6 @@ import (
 	"github.com/caddyserver/caddy/v2"
 )
 
-func TestRequireAuth(t *testing.T) {
-	t.Setenv(tokenEnvName, "secret")
-
-	req := httptest.NewRequest(http.MethodGet, "/fops-router/v1/status", nil)
-	if err := requireAuth(req); err == nil {
-		t.Fatal("expected missing auth error")
-	}
-
-	req.Header.Set("Authorization", "Bearer secret")
-	if err := requireAuth(req); err != nil {
-		t.Fatalf("requireAuth() error = %v", err)
-	}
-}
-
-func TestRequireAuthRequiresConfiguredToken(t *testing.T) {
-	_ = os.Unsetenv(tokenEnvName)
-
-	req := httptest.NewRequest(http.MethodGet, "/fops-router/v1/status", nil)
-	req.Header.Set("Authorization", "Bearer secret")
-	if err := requireAuth(req); err == nil {
-		t.Fatal("expected missing token configuration error")
-	}
-}
-
 func TestParseStackPath(t *testing.T) {
 	project, instance, err := parseStackPath("/fops-router/v1/stacks/example-app/production")
 	if err != nil {
@@ -89,7 +65,6 @@ func TestDecodeJSONBodyRejectsTooLargeBody(t *testing.T) {
 }
 
 func TestHandleStackReturnsBadRequestForValidationError(t *testing.T) {
-	t.Setenv(tokenEnvName, "secret")
 	dir := t.TempDir()
 	handler := &AdminHandler{
 		manager: NewManager(filepath.Join(dir, "registry.json"), filepath.Join(dir, "routes.Caddyfile"), nil),
@@ -113,7 +88,6 @@ func TestHandleStackReturnsBadRequestForValidationError(t *testing.T) {
 	}`, stack.Project, stack.Instance, stack.Routes[0].ID, stack.Routes[0].Hosts[0], stack.Routes[0].Entrypoint, stack.Routes[0].Upstream.Scheme, stack.Routes[0].Upstream.NetworkAlias, stack.Routes[0].Upstream.Port)
 
 	req := httptest.NewRequest(http.MethodPut, "/fops-router/v1/stacks/example-app/production", strings.NewReader(body))
-	req.Header.Set("Authorization", "Bearer secret")
 	err := handler.handleStack(httptest.NewRecorder(), req)
 
 	apiErr := assertAPIError(t, err, http.StatusBadRequest)
@@ -123,7 +97,6 @@ func TestHandleStackReturnsBadRequestForValidationError(t *testing.T) {
 }
 
 func TestHandleStackReturnsGenericInternalErrorWhenReloadFails(t *testing.T) {
-	t.Setenv(tokenEnvName, "secret")
 	dir := t.TempDir()
 	handler := &AdminHandler{
 		manager: NewManager(filepath.Join(dir, "registry.json"), filepath.Join(dir, "routes.Caddyfile"), func() error {
@@ -146,7 +119,6 @@ func TestHandleStackReturnsGenericInternalErrorWhenReloadFails(t *testing.T) {
 		}]
 	}`
 	req := httptest.NewRequest(http.MethodPut, "/fops-router/v1/stacks/example-app/production", strings.NewReader(body))
-	req.Header.Set("Authorization", "Bearer secret")
 	err := handler.handleStack(httptest.NewRecorder(), req)
 
 	apiErr := assertAPIError(t, err, http.StatusInternalServerError)
@@ -159,7 +131,6 @@ func TestHandleStackReturnsGenericInternalErrorWhenReloadFails(t *testing.T) {
 }
 
 func TestHandleStatusReturnsGenericInternalError(t *testing.T) {
-	t.Setenv(tokenEnvName, "secret")
 	dir := t.TempDir()
 	registryPath := filepath.Join(dir, "registry.json")
 	if err := os.WriteFile(registryPath, []byte("{"), 0644); err != nil {
@@ -170,7 +141,6 @@ func TestHandleStatusReturnsGenericInternalError(t *testing.T) {
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/fops-router/v1/status", nil)
-	req.Header.Set("Authorization", "Bearer secret")
 	err := handler.handleStatus(httptest.NewRecorder(), req)
 
 	apiErr := assertAPIError(t, err, http.StatusInternalServerError)
@@ -183,7 +153,6 @@ func TestHandleStatusReturnsGenericInternalError(t *testing.T) {
 }
 
 func TestHandleStacksReturnsGenericInternalError(t *testing.T) {
-	t.Setenv(tokenEnvName, "secret")
 	dir := t.TempDir()
 	registryPath := filepath.Join(dir, "registry.json")
 	if err := os.WriteFile(registryPath, []byte("{"), 0644); err != nil {
@@ -194,7 +163,6 @@ func TestHandleStacksReturnsGenericInternalError(t *testing.T) {
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/fops-router/v1/stacks", nil)
-	req.Header.Set("Authorization", "Bearer secret")
 	err := handler.handleStacks(httptest.NewRecorder(), req)
 
 	apiErr := assertAPIError(t, err, http.StatusInternalServerError)

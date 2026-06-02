@@ -1,14 +1,12 @@
 package fopscaddyrouter
 
 import (
-	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/caddyserver/caddy/v2"
@@ -41,9 +39,6 @@ func (h *AdminHandler) Routes() []caddy.AdminRoute {
 }
 
 func (h *AdminHandler) handleStatus(w http.ResponseWriter, r *http.Request) error {
-	if err := requireAuth(r); err != nil {
-		return err
-	}
 	if r.Method != http.MethodGet {
 		return apiError(http.StatusMethodNotAllowed, "method not allowed")
 	}
@@ -57,9 +52,6 @@ func (h *AdminHandler) handleStatus(w http.ResponseWriter, r *http.Request) erro
 }
 
 func (h *AdminHandler) handleStacks(w http.ResponseWriter, r *http.Request) error {
-	if err := requireAuth(r); err != nil {
-		return err
-	}
 	if r.Method != http.MethodGet {
 		return apiError(http.StatusMethodNotAllowed, "method not allowed")
 	}
@@ -73,10 +65,6 @@ func (h *AdminHandler) handleStacks(w http.ResponseWriter, r *http.Request) erro
 }
 
 func (h *AdminHandler) handleStack(w http.ResponseWriter, r *http.Request) error {
-	if err := requireAuth(r); err != nil {
-		return err
-	}
-
 	project, instance, err := parseStackPath(r.URL.Path)
 	if err != nil {
 		return apiError(http.StatusNotFound, err.Error())
@@ -123,20 +111,6 @@ func parseStackPath(path string) (string, string, error) {
 	}
 
 	return project, instance, nil
-}
-
-func requireAuth(r *http.Request) error {
-	token := os.Getenv(tokenEnvName)
-	if token == "" {
-		return apiError(http.StatusServiceUnavailable, tokenEnvName+" is not configured")
-	}
-
-	expected := "Bearer " + token
-	if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte(expected)) != 1 {
-		return apiError(http.StatusUnauthorized, "invalid authorization token")
-	}
-
-	return nil
 }
 
 func decodeJSONBody(w http.ResponseWriter, r *http.Request, value any) error {

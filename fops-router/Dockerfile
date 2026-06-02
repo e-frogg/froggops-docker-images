@@ -19,7 +19,7 @@ COPY --from=builder /src/caddy /usr/bin/caddy
 
 RUN apk add --no-cache bash curl
 COPY --link rootfs /
-RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
+RUN chmod 755 /usr/local/bin/docker-entrypoint.sh /usr/local/bin/fops-routerctl
 
 EXPOSE 80
 EXPOSE 443

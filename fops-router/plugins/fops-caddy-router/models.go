@@ -6,7 +6,6 @@ const (
 	defaultRegistryPath  = "/data/fops-router/registry.json"
 	defaultGeneratedPath = "/data/fops-router/generated/routes.Caddyfile"
 	defaultCaddyfilePath = "/etc/caddy/Caddyfile"
-	tokenEnvName         = "FOPS_ROUTER_API_TOKEN"
 	maxRequestBodyBytes  = 1 << 20
 )
 

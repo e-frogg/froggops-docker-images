@@ -4,7 +4,6 @@ services:
     container_name: ${FOPS_ROUTER_CONTAINER_NAME:-fops-router}
     restart: unless-stopped
     environment:
-      FOPS_ROUTER_API_TOKEN: ${FOPS_ROUTER_API_TOKEN:?Set FOPS_ROUTER_API_TOKEN in .env}
       CADDY_MAIN_DIRECTIVES: |
         email ${CADDY_ACME_EMAIL:?Set CADDY_ACME_EMAIL in .env}
       CADDY_MAINTENANCE_DIRECTIVES: |
