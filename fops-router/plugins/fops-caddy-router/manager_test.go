@@ -82,6 +82,46 @@ func TestManagerRollsBackFilesWhenReloadFails(t *testing.T) {
 	}
 }
 
+func TestManagerDoesNotCommitWhenPreviousGeneratedFileCannotBeRead(t *testing.T) {
+	dir := t.TempDir()
+	generatedPath := filepath.Join(dir, "routes.Caddyfile")
+	manager := NewManager(filepath.Join(dir, "registry.json"), generatedPath, nil)
+
+	if _, err := manager.UpsertStack("example-app", "production", sampleStack("example-app", "production", "web")); err != nil {
+		t.Fatalf("first UpsertStack() error = %v", err)
+	}
+
+	if err := os.Chmod(generatedPath, 0000); err != nil {
+		t.Fatalf("chmod generated file: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chmod(generatedPath, 0644)
+	})
+	if _, err := os.ReadFile(generatedPath); err == nil {
+		t.Skip("test requires chmod to make the generated file unreadable")
+	}
+
+	reloadCalled := false
+	manager.reloader = func() error {
+		reloadCalled = true
+		return errors.New("reload failed")
+	}
+	if _, err := manager.UpsertStack("other-app", "production", sampleStack("other-app", "production", "main")); err == nil {
+		t.Fatal("expected unreadable generated file error")
+	}
+	if reloadCalled {
+		t.Fatal("reloader should not be called when the previous generated file cannot be read")
+	}
+
+	registry, err := manager.LoadRegistry()
+	if err != nil {
+		t.Fatalf("LoadRegistry() error = %v", err)
+	}
+	if len(registry.Stacks) != 1 {
+		t.Fatalf("expected registry to remain unchanged, got %d stacks", len(registry.Stacks))
+	}
+}
+
 func TestManagerDeleteStack(t *testing.T) {
 	dir := t.TempDir()
 	manager := NewManager(filepath.Join(dir, "registry.json"), filepath.Join(dir, "routes.Caddyfile"), nil)

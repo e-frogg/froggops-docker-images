@@ -1,6 +1,6 @@
 services:
   fops-router:
-    image: ${FOPS_ROUTER_IMAGE:-ghcr.io/e-frogg/froggops-docker-images-fops-router}:${FOPS_ROUTER_VERSION:-latest}
+    image: ${FOPS_ROUTER_IMAGE:-ghcr.io/e-frogg/froggops-docker-images-fops-router}:${FOPS_ROUTER_VERSION:?Set FOPS_ROUTER_VERSION in .env}
     container_name: ${FOPS_ROUTER_CONTAINER_NAME:-fops-router}
     restart: unless-stopped
     environment:

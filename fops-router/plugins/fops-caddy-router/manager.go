@@ -128,6 +128,10 @@ func (m *Manager) commit(previous Registry, next Registry) error {
 
 	previousRegistryData, _ := json.MarshalIndent(previous, "", "  ")
 	previousGeneratedData, previousGeneratedErr := os.ReadFile(m.generatedPath)
+	previousGeneratedMissing := errors.Is(previousGeneratedErr, os.ErrNotExist)
+	if previousGeneratedErr != nil && !previousGeneratedMissing {
+		return previousGeneratedErr
+	}
 
 	generated, err := GenerateCaddyfile(next)
 	if err != nil {
@@ -152,7 +156,7 @@ func (m *Manager) commit(previous Registry, next Registry) error {
 			_ = atomicWrite(m.registryPath, append(previousRegistryData, '\n'), 0644)
 			if previousGeneratedErr == nil {
 				_ = atomicWrite(m.generatedPath, previousGeneratedData, 0644)
-			} else {
+			} else if previousGeneratedMissing {
 				_ = os.Remove(m.generatedPath)
 			}
 			return err

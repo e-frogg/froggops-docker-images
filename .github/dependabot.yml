@@ -4,16 +4,78 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "/mkdocs"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10 
+    open-pull-requests-limit: 3
+    groups:
+      mkdocs-docker:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "/caddy-maintenance"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10 
+    open-pull-requests-limit: 3
+    groups:
+      caddy-maintenance-docker:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "/fops-ci-php"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    groups:
+      fops-ci-php-docker:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "/fops-clock"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    groups:
+      fops-clock-docker:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "/fops-router"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    groups:
+      fops-router-docker:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "gomod"
+    directory: "/fops-clock/src"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    groups:
+      fops-clock-go:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "gomod"
+    directory: "/fops-router/plugins/fops-caddy-router"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    groups:
+      fops-router-go:
+        patterns:
+          - "*"

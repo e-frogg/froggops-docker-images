@@ -121,7 +121,7 @@ docker exec fops-router curl --unix-socket /run/caddy/admin.sock \
           "network_alias": "example-app-caddy",
           "port": 443,
           "tls_server_name": "app.example.com",
-          "tls_insecure_skip_verify": true
+          "tls_insecure_skip_verify": false
         }
       }
     ]
@@ -129,6 +129,8 @@ docker exec fops-router curl --unix-socket /run/caddy/admin.sock \
 ```
 
 Le `PUT` remplace l’état complet de la stack `{project}/{instance}`. Supprimer une route côté fops-cli revient donc à ne plus l’envoyer au prochain `PUT`. Le `DELETE` retire toute la stack.
+
+Attention : `tls_insecure_skip_verify` est strictement réservé au développement ou aux tests temporaires. En production, garde cette valeur à `false` et utilise des certificats valides côté upstream.
 
 Le plugin refuse les collisions : un même hôte ne peut pas être déclaré par deux stacks différentes.
 
