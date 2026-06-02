@@ -1,21 +1,21 @@
-name: fops-clock
+name: fops-router
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "fops-clock/**"
+      - "fops-router/**"
       - ".github/workflows/_docker-image.yml"
-      - ".github/workflows/fops-clock.yml"
+      - ".github/workflows/fops-router.yml"
   pull_request:
     branches: ["main"]
     paths:
-      - "fops-clock/**"
+      - "fops-router/**"
       - ".github/workflows/_docker-image.yml"
-      - ".github/workflows/fops-clock.yml"
+      - ".github/workflows/fops-router.yml"
 
 concurrency:
-  group: fops-clock-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: fops-router-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: fops-clock/src
+        working-directory: fops-router/plugins/fops-caddy-router
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -36,8 +36,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
         with:
-          go-version: "1.21"
-          cache-dependency-path: fops-clock/src/go.sum
+          go-version: "1.25"
+          cache-dependency-path: fops-router/plugins/fops-caddy-router/go.sum
 
       - name: Run unit tests
         run: go test ./...
@@ -52,8 +52,9 @@ jobs:
       security-events: write
     uses: ./.github/workflows/_docker-image.yml
     with:
-      image: fops-clock
-      version: "1"
-      context: ./fops-clock
-      dockerfile: ./fops-clock/Dockerfile
-      trivy-category: trivy-fops-clock
+      image: fops-router
+      version: "2.11.3"
+      fops-image-version: "2.11.3"
+      context: ./fops-router
+      dockerfile: ./fops-router/Dockerfile
+      trivy-category: trivy-fops-router

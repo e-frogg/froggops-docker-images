@@ -1,0 +1,41 @@
+name: fops-ci-php
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "fops-ci-php/**"
+      - ".github/workflows/_docker-image.yml"
+      - ".github/workflows/fops-ci-php.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "fops-ci-php/**"
+      - ".github/workflows/_docker-image.yml"
+      - ".github/workflows/fops-ci-php.yml"
+
+concurrency:
+  group: fops-ci-php-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["8.3", "8.4"]
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/_docker-image.yml
+    with:
+      image: fops-ci-php
+      version: ${{ matrix.version }}
+      context: ./fops-ci-php
+      dockerfile: ./fops-ci-php/Dockerfile
+      trivy-category: trivy-fops-ci-php-${{ matrix.version }}
+      latest: ${{ matrix.version == '8.4' }}
+      trivy-skip-dirs: /root/.composer

@@ -1,10 +1,10 @@
 {
-    debug
-    admin 0.0.0.0:2019
-    {$CADDY_MAIN_DIRECTIVES}
-    order maintenance first
+	admin unix//run/caddy/admin.sock
+	import /data/fops-router/runtime/main-directives.Caddyfile
+	order maintenance first
 }
 
 import /etc/fops-router/entrypoints/*.Caddyfile
+import /data/fops-router/generated/*.Caddyfile
 
-{$CADDY_VHOSTS}
+import /data/fops-router/runtime/vhosts.Caddyfile

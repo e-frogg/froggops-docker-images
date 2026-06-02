@@ -92,8 +92,8 @@ go run . --schedule "*/1 * * * *" --command "echo via flag"
 
 ## CI/CD
 
-- `.github/workflows/fops-clock.yml` runs Go tests, Hadolint, Trivy, then builds and pushes `ghcr.io/e-frogg/froggops-docker-images-fops-clock` (plus provenance attestation).
-- `.github/workflows/build.yml` remains the umbrella workflow for the other images in this repository.
+- `.github/workflows/fops-clock.yml` runs Go tests, then calls the shared Docker workflow for Hadolint, Trivy, image build, GHCR push on `main`, and provenance attestation.
+- `.github/workflows/_docker-image.yml` is the shared Docker workflow used by the image-specific workflows in this repository.
 
 ---
 

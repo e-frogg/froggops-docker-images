@@ -1,0 +1,35 @@
+name: caddy-maintenance
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "caddy-maintenance/**"
+      - ".github/workflows/_docker-image.yml"
+      - ".github/workflows/caddy-maintenance.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "caddy-maintenance/**"
+      - ".github/workflows/_docker-image.yml"
+      - ".github/workflows/caddy-maintenance.yml"
+
+concurrency:
+  group: caddy-maintenance-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/_docker-image.yml
+    with:
+      image: caddy-maintenance
+      version: "2"
+      context: ./caddy-maintenance
+      dockerfile: ./caddy-maintenance/Dockerfile
+      trivy-category: trivy-caddy-maintenance

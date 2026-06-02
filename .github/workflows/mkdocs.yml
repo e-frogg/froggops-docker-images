@@ -1,0 +1,35 @@
+name: mkdocs
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "mkdocs/**"
+      - ".github/workflows/_docker-image.yml"
+      - ".github/workflows/mkdocs.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "mkdocs/**"
+      - ".github/workflows/_docker-image.yml"
+      - ".github/workflows/mkdocs.yml"
+
+concurrency:
+  group: mkdocs-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/_docker-image.yml
+    with:
+      image: mkdocs
+      version: "9"
+      context: ./mkdocs
+      dockerfile: ./mkdocs/Dockerfile
+      trivy-category: trivy-mkdocs
