@@ -61,7 +61,7 @@ COPY --link ./php.ini $PHP_INI_DIR/conf.d/
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
-ENV DISABLE_VERSION_CHECK=1
+ENV CASTOR_DISABLE_VERSION_CHECK=1
 COPY --from=composer --link /composer /usr/bin/composer
 
 ARG FOPS_IMAGE_VERSION
