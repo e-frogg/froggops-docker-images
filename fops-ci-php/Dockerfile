@@ -46,6 +46,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gd \
         bz2 \
         bcmath \
+        fileinfo \
         pcntl \
         pcov \
         pdo \
@@ -63,7 +64,19 @@ ENV PATH="${PATH}:/root/.composer/vendor/bin"
 ENV DISABLE_VERSION_CHECK=1
 COPY --from=composer --link /composer /usr/bin/composer
 
-RUN curl "https://github.com/jolicode/castor/releases/latest/download/castor.linux-amd64" -Lfso /usr/bin/castor && \
+ARG FOPS_IMAGE_VERSION
+ARG CASTOR_VERSION=latest
+ARG CASTOR_VERSION_PHP_83=v1.5.0
+
+RUN if [ "$FOPS_IMAGE_VERSION" = "8.3" ]; then \
+        CASTOR_VERSION="$CASTOR_VERSION_PHP_83"; \
+    fi && \
+    if [ "$CASTOR_VERSION" = "latest" ]; then \
+        CASTOR_RELEASE_PATH="latest/download"; \
+    else \
+        CASTOR_RELEASE_PATH="download/$CASTOR_VERSION"; \
+    fi && \
+    curl "https://github.com/jolicode/castor/releases/$CASTOR_RELEASE_PATH/castor.linux-amd64.phar" -Lfso /usr/bin/castor && \
     chmod u+x /usr/bin/castor && \
     castor --version || \
     (echo "Could not install castor. Is the target directory writeable?" && (exit 1))
