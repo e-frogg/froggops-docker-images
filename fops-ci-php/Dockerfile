@@ -1,5 +1,5 @@
 ARG FOPS_IMAGE_VERSION
-ARG CDPX_IMAGE=ghcr.io/inem0o/cdpx:0.1.4@sha256:9e0e7209b2e073764abc96f5effe97f76d445b4e244ea860d90ac717041bc43f
+ARG CDPX_IMAGE=ghcr.io/inem0o/cdpx:0.2.0@sha256:fa8d3c4865665b2aa620b918178692864880ed7dcd965f60d6fc09559a0f6a44
 
 FROM ${CDPX_IMAGE} AS cdpx
 
@@ -136,8 +136,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 
 # cdpx embedded bundle
-# cdpx 0.1.4 must invoke the real installer path because /opt/cdpx/install
-# resolves its bundle root incorrectly when called through its symlink.
+# Invoke the real installer path so the embedded bundle root stays independent
+# from the destination symlink.
 COPY --from=cdpx /opt/cdpx /opt/cdpx
 
 RUN set -eux; \
