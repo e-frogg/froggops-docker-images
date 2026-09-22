@@ -53,8 +53,8 @@ jobs:
     uses: ./.github/workflows/_docker-image.yml
     with:
       image: fops-router
-      version: "2.11.3"
-      fops-image-version: "2.11.3"
+      version: "2.11.4"
+      fops-image-version: "2.11.4"
       context: ./fops-router
       dockerfile: ./fops-router/Dockerfile
       trivy-category: trivy-fops-router
