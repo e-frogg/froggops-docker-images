@@ -1,4 +1,5 @@
 ARG FOPS_IMAGE_VERSION
+ARG PHP_BASE_IMAGE=php:${FOPS_IMAGE_VERSION}-cli
 ARG CDPX_IMAGE=ghcr.io/inem0o/cdpx:0.2.0@sha256:fa8d3c4865665b2aa620b918178692864880ed7dcd965f60d6fc09559a0f6a44
 
 FROM ${CDPX_IMAGE} AS cdpx
@@ -8,7 +9,7 @@ FROM node:26-trixie AS node
 FROM composer/composer:2-bin AS composer
 FROM mlocati/php-extension-installer:latest AS php_extension_installer
 
-FROM php:${FOPS_IMAGE_VERSION}-cli
+FROM ${PHP_BASE_IMAGE}
 
 
 #

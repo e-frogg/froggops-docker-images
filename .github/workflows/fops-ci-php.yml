@@ -23,7 +23,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["8.3", "8.4", "8.5"]
+        include:
+          - version: "8.3"
+            php-base-image: "php:8.3.35-cli@sha256:aafe21201943a8a6e497ddfb471e2ce68ada76adede38c7d61fede8918b24319"
+          - version: "8.4"
+            php-base-image: "php:8.4.26-cli@sha256:1d2cf2b7d715b5b3aa959f0150ccbcc7b71e0181b637e443abf40a7fb56bf79a"
+          - version: "8.5"
+            php-base-image: "php:8.5.11-cli@sha256:01a109229f4465bc9ef042d9198f09a4d9da7775a825dbd8572dcdbd8756c4d3"
     permissions:
       contents: read
       packages: write
@@ -34,6 +40,7 @@ jobs:
     with:
       image: fops-ci-php
       version: ${{ matrix.version }}
+      php-base-image: ${{ matrix.php-base-image }}
       context: ./fops-ci-php
       dockerfile: ./fops-ci-php/Dockerfile
       trivy-category: trivy-fops-ci-php-${{ matrix.version }}
