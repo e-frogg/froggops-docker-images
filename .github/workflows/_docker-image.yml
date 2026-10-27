@@ -108,18 +108,17 @@ jobs:
       - name: Push Docker image
         id: push
         if: github.event_name == 'push'
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc
-        with:
-          context: ${{ inputs.context }}
-          file: ${{ inputs.dockerfile }}
-          pull: true
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ inputs.image }}-${{ inputs.version }}
-          cache-to: type=gha,mode=max,scope=${{ inputs.image }}-${{ inputs.version }},ignore-error=true
-          build-args: |
-            FOPS_IMAGE_VERSION=${{ inputs.fops-image-version || inputs.version }}
+        env:
+          IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ inputs.image }}:${{ inputs.version }}
+        run: |
+          while IFS= read -r tag; do
+            [ -z "$tag" ] || docker push "$tag"
+          done <<< "$IMAGE_TAGS"
+          repo_digest=$(docker image inspect --format '{{index .RepoDigests 0}}' "$IMAGE_REF")
+          digest="${repo_digest##*@}"
+          [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
