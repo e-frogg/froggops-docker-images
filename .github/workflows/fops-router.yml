@@ -36,7 +36,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v6
         with:
-          go-version: "1.25"
+          go-version-file: fops-router/plugins/fops-caddy-router/go.mod
           cache-dependency-path: fops-router/plugins/fops-caddy-router/go.sum
 
       - name: Run unit tests
@@ -53,8 +53,8 @@ jobs:
     uses: ./.github/workflows/_docker-image.yml
     with:
       image: fops-router
-      version: "2.11.4"
-      fops-image-version: "2.11.4"
+      version: "2.11.7"
+      fops-image-version: "2.11.7"
       context: ./fops-router
       dockerfile: ./fops-router/Dockerfile
       trivy-category: trivy-fops-router
