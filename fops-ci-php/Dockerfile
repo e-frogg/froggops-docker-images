@@ -65,21 +65,21 @@ ENV CASTOR_DISABLE_VERSION_CHECK=1
 COPY --from=composer --link /composer /usr/bin/composer
 
 ARG FOPS_IMAGE_VERSION
-ARG CASTOR_VERSION=latest
+ARG CASTOR_VERSION=v1.9.0
+ARG CASTOR_SHA256=2f5feb73a96714cc31c73979be9c6d78c320ce3ef543163d243d9123de61e59f
+# Castor 1.9 requires PHP >=8.4.1; retain the compatible PHAR on PHP 8.3.
 ARG CASTOR_VERSION_PHP_83=v1.5.0
+ARG CASTOR_SHA256_PHP_83=379fa31b4c4b13a69a18a92b073bdfcf2606807baadb70909435ca2166c4c015
 
-RUN if [ "$FOPS_IMAGE_VERSION" = "8.3" ]; then \
+RUN set -eux; \
+    if [ "$FOPS_IMAGE_VERSION" = "8.3" ]; then \
         CASTOR_VERSION="$CASTOR_VERSION_PHP_83"; \
-    fi && \
-    if [ "$CASTOR_VERSION" = "latest" ]; then \
-        CASTOR_RELEASE_PATH="latest/download"; \
-    else \
-        CASTOR_RELEASE_PATH="download/$CASTOR_VERSION"; \
-    fi && \
-    curl "https://github.com/jolicode/castor/releases/$CASTOR_RELEASE_PATH/castor.linux-amd64.phar" -Lfso /usr/bin/castor && \
-    chmod u+x /usr/bin/castor && \
-    castor --version || \
-    (echo "Could not install castor. Is the target directory writeable?" && (exit 1))
+        CASTOR_SHA256="$CASTOR_SHA256_PHP_83"; \
+    fi; \
+    curl "https://github.com/jolicode/castor/releases/download/$CASTOR_VERSION/castor.linux-amd64.phar" -Lfso /usr/bin/castor; \
+    echo "$CASTOR_SHA256  /usr/bin/castor" | sha256sum -c -; \
+    chmod 755 /usr/bin/castor; \
+    castor --version
 
 #
 # Nodes deps
