@@ -9,3 +9,6 @@ PHP >=8.4.1. Castor downloads are pinned and verified with SHA-256.
 `latest` remains an alias for the PHP 8.4 image.
 
 Builds pull their base images to refresh floating tags before rebuilding.
+
+All `fops-ci-php` images include the Debian `python3` package (standard
+library only, no pip) for stdlib-only CI checks.

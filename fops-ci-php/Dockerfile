@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     rsync \
     jq \
+    python3 \
     && rm -rf /var/lib/apt/lists/* \
     && set -eux; \
     install-php-extensions \
